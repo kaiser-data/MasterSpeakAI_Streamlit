@@ -7,10 +7,13 @@ import os
 from dotenv import load_dotenv
 
 load_dotenv()
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 app = FastAPI()
 
+# Initialize OpenAI client
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
+# Request Model
 class AnalyzeRequest(BaseModel):
     content: str
     model: str = "gpt-3.5-turbo"

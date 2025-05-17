@@ -1,30 +1,14 @@
 import streamlit as st
-import requests
 
-st.title("🎙️ Speech Analyzer with GenAI")
+st.set_page_config(page_title="MasterSpeakAI", page_icon="🧠")
 
-speech_text = st.text_area("Paste your speech text here:")
-model_choice = st.selectbox("Choose OpenAI Model", ["gpt-3.5-turbo", "gpt-4o"])
+# Define pages
+home_page = st.Page("pages/0_Home.py", title="Home", icon="🧠")
+analyze_page = st.Page("pages/1_Speech_Analyis.py", title="Speech Analysis", icon="🎙️")
+viewer_page = st.Page("pages/2_Database_Viewer.py", title="View Database", icon="💾")
 
-if st.button("Analyze"):
-    if not speech_text.strip():
-        st.error("Please enter some text.")
-    else:
-        with st.spinner("Analyzing..."):
-            try:
-                response = requests.post(
-                    "http://localhost:8000/analyze",
-                    json={"content": speech_text, "model": model_choice}
-                )
+# Set up navigation
+pg = st.navigation([home_page, analyze_page, viewer_page])
 
-                if response.status_code == 200:
-                    result = response.json()
-                    st.success("Analysis Complete!")
-                    st.markdown("### 📝 Analysis Result")
-                    st.write(result["analysis"])
-                else:
-                    st.error(f"Backend error ({response.status_code}):")
-                    st.json(response.json())
-
-            except Exception as e:
-                st.error(f"Request failed: {e}")
+# Run the selected page
+pg.run()

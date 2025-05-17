@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "masterspeakai"
+version = "0.1.0"
+description = "Streamlit frontend with FastAPI backend"
+authors = ["Your Name <you@example.com>"]
+readme = "README.md"
+packages = [{ include = "backend" }, { include = "frontend" }]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+pandas = "^2.2.0"
+fastapi = "^0.110.0"
+uvicorn = "^0.29.0"
+sqlmodel = "^0.0.14"
+python-dotenv = "^1.0.1"
+streamlit = "^1.34.0"
+plotly = "^5.22.0"
+requests = "^2.32.0"
+pydantic = "^2.7.1"
+openai = "^1.23.6"
+httpx = "^0.27.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

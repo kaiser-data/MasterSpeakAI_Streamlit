@@ -1,9 +1,12 @@
+pandas
 fastapi
 uvicorn
 sqlmodel
 python-dotenv
 streamlit
+streamlit-pages
+plotly
 requests
 pydantic
-openai>
-httpx>
+openai
+httpx
