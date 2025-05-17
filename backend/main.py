@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from sqlmodel import Session, select
-from backend.database import engine, SpeechAnalysis
+from backend.database import speech_engine, SpeechAnalysis
 from pydantic import BaseModel
 from openai import OpenAI
 import os
@@ -30,7 +30,7 @@ def analyze_speech(request: AnalyzeRequest):
         )
         analysis = response.choices[0].message.content
 
-        with Session(engine) as session:
+        with Session(speech_engine) as session:
             db_record = SpeechAnalysis(
                 content=request.content,
                 model_used=request.model,

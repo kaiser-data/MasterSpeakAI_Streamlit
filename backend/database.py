@@ -1,4 +1,4 @@
-from sqlmodel import Field, Session, SQLModel, create_engine, select
+from sqlmodel import Field, SQLModel, create_engine
 from typing import Optional
 
 # === Speech DB ===
@@ -24,3 +24,17 @@ prompt_engine = create_engine("sqlite:///prompt_db.db")
 
 def create_prompt_table():
     SQLModel.metadata.create_all(prompt_engine)
+
+class ModelConfig(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    model_name: str
+    temperature: Optional[float] = 1.0
+    max_tokens: Optional[int] = 1024
+    top_p: Optional[float] = None
+    frequency_penalty: Optional[float] = None
+    presence_penalty: Optional[float] = None
+
+model_engine = create_engine("sqlite:///model_settings.db")
+
+def create_model_table():
+    SQLModel.metadata.create_all(model_engine)
