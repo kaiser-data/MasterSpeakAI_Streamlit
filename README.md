@@ -1,28 +1,24 @@
-Absolutely — here’s a clear and polished **`README.md`** that explains your app, its structure, and how to use **Poetry** for managing the environment.
-
----
-
-## ✅ Recommended `README.md`
-
-```markdown
 # 🧠 MasterSpeakAI
 
 MasterSpeakAI is a GenAI-powered speech analysis app with:
 
-- 🎛️ A Streamlit frontend
+- 🎛️ A Streamlit frontend using `st.navigation` and `st.Page`
 - 🔥 FastAPI backend
 - 🧪 GPT-powered analysis (via OpenAI)
-- 💾 SQLite databases for storing analyses and custom prompt presets
-- 📦 Managed using Poetry for clean dependency handling
+- 💾 Local SQLite databases for storing analyses, prompt presets, and model settings
+- ⚙️ Model-specific configuration (e.g., temperature, max_tokens)
+- 📦 Managed with Poetry
 
 ---
 
 ## 🚀 Features
 
-- 🎙️ Analyze speeches with GPT models (gpt-3.5-turbo, gpt-4o, etc.)
-- 🧠 Customize system prompts to control model behavior
-- 📊 View and manage stored analysis history
-- ⚙️ Full local database support for both prompts and results
+- 🎙️ Analyze speech content using OpenAI GPT models (3.5, 4, 4o, etc.)
+- 🧠 Create and edit reusable system prompt presets
+- ⚙️ Configure model settings (e.g., temperature) per model
+- 💾 View and retrieve records using compact scrollable DB viewers
+- 📎 Manual ID lookup for speech/prompt/model records
+- 🧩 Grouped sidebar navigation for logical app structure
 
 ---
 
@@ -31,29 +27,56 @@ MasterSpeakAI is a GenAI-powered speech analysis app with:
 ```
 
 kaiser-data-masterspeakai\_streamlit/
-├── backend/                # FastAPI backend
-│   ├── database.py
-│   └── main.py
-├── frontend/               # Streamlit frontend
-│   ├── app.py              # Entry point (uses st.navigation)
-│   └── pages/              # Multi-page setup
+├── backend/
+│   ├── database.py              # SQLModel tables for speech, prompts, models
+│   ├── main.py                  # FastAPI app with /analyze endpoint
+│   ├── init\_db.py               # Creates all DB tables
+├── frontend/
+│   ├── app.py                   # Main entrypoint with st.navigation sidebar
+│   └── pages/
 │       ├── 0\_Home.py
-│       ├── 1\_Speech\_Analyis.py
-│       ├── 2\_Database\_Viewer.py
-│       └── 3\_Prompt\_Settings.py
-├── speech\_db.db            # Stores speech analysis records
-├── prompt\_db.db            # Stores custom prompt presets
-├── pyproject.toml          # Poetry configuration
-├── requirements.txt        # Optional: for pip fallback
-├── init\_db.py              # Script to initialize DBs
+│       ├── 1\_Speech\_Analysis.py
+│       ├── 2\_Database\_Viewer.py         # Speech DB (manual ID lookup)
+│       ├── 3\_Prompt\_Settings.py         # Create/edit prompts
+│       ├── 4\_Prompt\_Viewer.py           # Prompt DB (manual ID lookup)
+│       ├── 5\_Model\_Settings.py          # Edit model config
+│       └── 6\_Model\_Settings\_Viewer.py   # View saved configs
+├── init\_db.py                  # Calls backend.init\_db functions
+├── pyproject.toml              # Poetry config
+├── requirements.txt            # pip fallback
+├── speech\_db.db
+├── prompt\_db.db
+├── model\_settings.db
+└── .env                        # For OPENAI\_API\_KEY
 
 ````
 
 ---
 
+## 🧭 Sidebar Navigation
+
+Organized using `st.navigation()` with icons and sections:
+
+- 🧠 MasterSpeakAI  
+  - 🏠 Home
+
+- 🔊 Speech Analysis  
+  - 🎙️ Analyze Speech  
+  - 💾 Speech DB Viewer (with manual ID input)
+
+- 🛠️ Prompt Settings  
+  - 🛠️ Prompt Editor  
+  - 📜 Prompt DB Viewer (with manual ID input)
+
+- ⚙️ Model Settings  
+  - 🧩 Edit Model Settings (temperature, top_p, etc.)  
+  - 🗃️ Model DB Viewer
+
+---
+
 ## 📦 Dependency Management with Poetry
 
-> This project uses [Poetry](https://python-poetry.org/) to manage Python packages and virtual environments.
+> This project uses [Poetry](https://python-poetry.org/) to manage dependencies and virtual environments.
 
 ### 📥 Install Poetry
 
@@ -61,38 +84,28 @@ kaiser-data-masterspeakai\_streamlit/
 curl -sSL https://install.python-poetry.org | python3 -
 ````
 
-Make sure it’s on your path:
+Ensure it's on your PATH:
 
 ```bash
-export PATH=\"$HOME/.local/bin:$PATH\"
+export PATH="$HOME/.local/bin:$PATH"
 ```
 
 ---
 
 ### 📦 Install Dependencies
 
-Clone the repo and run:
-
 ```bash
+git clone https://github.com/your-org/kaiser-data-masterspeakai_streamlit.git
 cd kaiser-data-masterspeakai_streamlit
 poetry install
 ```
 
 ---
 
-### 🐍 Activate Environment
-
-With Poetry 2.x+, either run:
+### 🐍 Run the App
 
 ```bash
 poetry run streamlit run frontend/app.py
-```
-
-Or activate the venv directly:
-
-```bash
-source $(poetry env info --path)/bin/activate
-streamlit run frontend/app.py
 ```
 
 ---
@@ -103,60 +116,48 @@ streamlit run frontend/app.py
 poetry run python init_db.py
 ```
 
-This creates:
+Creates:
 
-* `speech_db.db` → for storing analysis results
-* `prompt_db.db` → for custom prompt presets
-
----
-
-## ▶️ Running the App
-
-```bash
-poetry run streamlit run frontend/app.py
-```
-
-In your browser: `http://localhost:8501`
+* `speech_db.db`
+* `prompt_db.db`
+* `model_settings.db`
 
 ---
 
-## 🧪 Running the Backend (Optional)
-
-The backend is a FastAPI server:
+## 🧪 Run Backend API
 
 ```bash
 poetry run uvicorn backend.main:app --reload
 ```
 
-Visit `http://localhost:8000/docs` to test the API.
+Visit the docs at:
+[http://localhost:8000/docs](http://localhost:8000/docs)
 
 ---
 
 ## 🔐 Environment Variables
 
-Create a `.env` file with:
+Create a `.env` file with your OpenAI key:
 
 ```
 OPENAI_API_KEY=your-key-here
 ```
 
-Used by both the backend and test scripts to connect to OpenAI.
+---
+
+## 🗂️ Future Improvements
+
+* ⏳ User authentication
+* ⏳ Role-based prompt/model visibility
+* ⏳ Speech-to-text input support
+* ⏳ Export results to CSV
+* ⏳ Admin edit/delete for DB records
 
 ---
 
-## 📌 TODO / Future Features
+## 🪪 License
 
-* ✅ Role-based prompt configuration
-* ✅ Database-driven prompt management
-* ⏳ User login and authentication
-* ⏳ Deployment (Streamlit Cloud / Docker)
-* ⏳ Speech-to-text input for audio files
-
----
-
-## 💬 License
-
-MIT License. 
+MIT License.
 
 ```
 

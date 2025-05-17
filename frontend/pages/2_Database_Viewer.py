@@ -1,52 +1,61 @@
 import streamlit as st
+from sqlmodel import Session, select
 from backend.database import SpeechAnalysis, speech_engine
-from sqlmodel import Session, select
+import pandas as pd
 
-st.title("\U0001f4be Stored Speech Analyses")
+st.title("💾 Speech Analysis Database")
 
+st.markdown("""
+Welcome to the **Speech Analysis Database**.
+You can:
+- 🧭 Enter an ID to view the full content and GPT analysis
+- 📋 Browse the latest entries in the table below for quick reference
+""")
+
+# Load records
 with Session(speech_engine) as session:
-    results = session.exec(select(SpeechAnalysis)).all()
-    st.write(f"\U0001f4ca Found {len(results)} records in the database.")
+    records = session.exec(select(SpeechAnalysis).order_by(SpeechAnalysis.id.desc())).all()
 
-    if results:
-        for r in results:
-            st.markdown(f"### \U0001f194 ID: {r.id}")
-            st.markdown(f"**\U0001f9e0 Model Used:** {r.model_used}")
-            st.markdown(f"**\U0001f5e3\ufe0f Speech:** {r.content[:100]}...")
-            st.markdown(f"**\U0001f4dd Analysis:** {r.analysis_result}")
-            st.divider()
+if not records:
+    st.info("No records found in the database.")
+    st.stop()
+
+# Create dataframe
+df = pd.DataFrame([r.dict() for r in records])
+df_display = df[["id", "model_used", "content", "analysis_result"]].copy()
+df_display["content"] = df_display["content"].str.slice(0, 60) + "..."
+df_display["analysis_result"] = df_display["analysis_result"].str.slice(0, 60) + "..."
+df_display = df_display.rename(columns={
+    "id": "ID",
+    "model_used": "Model",
+    "content": "Speech Snippet",
+    "analysis_result": "Analysis Snippet"
+})
+
+# Show up to 5 recent records
+st.dataframe(df_display.head(min(5, len(df_display))), use_container_width=True, hide_index=True)
+
+# Manual ID input only
+st.subheader("🔍 Enter Record ID to View")
+
+manual_id = st.number_input("Enter an ID", min_value=1, step=1)
+
+# Try to locate the record
+record = df_display[df_display["ID"] == manual_id]
+
+if record.empty:
+    st.warning(f"No record found with ID {manual_id}")
+else:
+    selected = record.iloc[0]
+    original = next((r for r in records if r.id == manual_id), None)
+
+    if original is None:
+        st.error("Could not load the selected record.")
     else:
-        st.info("No records found in the database.")
+        st.subheader(f"🧾 Record ID: {manual_id} — Model: {selected['Model']}")
 
-# FILE: frontend/pages/3_Prompt_Settings.py
-import streamlit as st
-from backend.database import PromptPreset, prompt_engine
-from sqlmodel import Session, select
+        with st.expander("🗣️ Full Speech Text"):
+            st.code(original.content)
 
-st.title("\U0001f527 Prompt Settings")
-
-with Session(prompt_engine) as session:
-    presets = session.exec(select(PromptPreset)).all()
-
-    st.subheader("Create a New Prompt Preset")
-    name = st.text_input("Preset Name")
-    role = st.text_input("Role")
-    prompt = st.text_area("Prompt", height=150)
-
-    if st.button("Save Prompt"):
-        if name and role and prompt:
-            preset = PromptPreset(name=name, role=role, prompt=prompt)
-            session.add(preset)
-            session.commit()
-            st.success("\u2705 Prompt saved successfully.")
-        else:
-            st.error("Please fill in all fields.")
-
-    st.subheader("\ud83d\udcdc Saved Prompts")
-    if presets:
-        for p in presets:
-            st.markdown(f"**{p.name}** – {p.role}")
-            st.markdown(f"`{p.prompt}`")
-            st.divider()
-    else:
-        st.info("No saved prompts.")
+        with st.expander("🧠 GPT Analysis Result"):
+            st.code(original.analysis_result)
