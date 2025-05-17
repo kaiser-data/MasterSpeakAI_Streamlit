@@ -6,7 +6,12 @@ class SpeechAnalysis(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     content: str
     model_used: str
-    analysis_result: str
+    analysis_result: str  # raw JSON from GPT
+
+    clarity: Optional[int] = None
+    structure: Optional[int] = None
+    tone_engagement: Optional[int] = None
+    summary: Optional[str] = None
 
 speech_engine = create_engine("sqlite:///speech_db.db")
 
@@ -38,3 +43,5 @@ model_engine = create_engine("sqlite:///model_settings.db")
 
 def create_model_table():
     SQLModel.metadata.create_all(model_engine)
+
+

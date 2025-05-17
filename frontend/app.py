@@ -1,26 +1,28 @@
 import streamlit as st
 
-# Set up the app configuration
-st.set_page_config(page_title="MasterSpeakAI",layout="wide", page_icon="🧠")
+# Global app layout config
+st.set_page_config(page_title="MasterSpeakAI", page_icon="🧠", layout="wide")
 
-# Define grouped sidebar navigation
+# Grouped and spaced sidebar navigation
 pg = st.navigation({
-    "🧠 MasterSpeakAI": [
+    "HOME 🧠": [
         st.Page("pages/0_Home.py", title="Home", icon="🏠"),
     ],
-    "🔊 Speech Analysis": [
+
+    "SPEECH ANALYSIS 🔊": [
         st.Page("pages/1_Speech_Analysis.py", title="Analyze Speech", icon="🎙️"),
         st.Page("pages/2_Database_Viewer.py", title="Speech DB Viewer", icon="💾"),
     ],
-    "🛠️ Prompt Settings": [
+
+    "PROMPT SETTINGS 🛠️": [
         st.Page("pages/3_Prompt_Settings.py", title="Prompt Editor", icon="🛠️"),
         st.Page("pages/4_Prompt_Viewer.py", title="Prompt DB Viewer", icon="📜"),
     ],
-    "⚙️ Model Settings": [
+
+    "MODEL SETTINGS ⚙️": [
         st.Page("pages/5_Model_Settings.py", title="Edit Model Settings", icon="🧩"),
         st.Page("pages/6_Model_Settings_Viewer.py", title="Model DB Viewer", icon="🗃️"),
-    ],
+    ]
 })
 
-# Run the selected page
 pg.run()
