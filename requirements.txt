@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+sqlmodel
+python-dotenv
+streamlit
+requests
+pydantic
+openai>
+httpx>
