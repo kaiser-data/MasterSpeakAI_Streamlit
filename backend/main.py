@@ -74,21 +74,14 @@ def analyze_speech(request: AnalyzeRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@lru_cache(maxsize=1)
-def fetch_llm_models():
-    try:
-        all_models = client.models.list()
-        llm_models = [
-            m.id for m in all_models.data
-            if m.id.startswith("gpt-") and "instruct" not in m.id
-        ]
-        return sorted(llm_models, reverse=True)
-    except Exception as e:
-        raise RuntimeError(f"Model fetch failed: {str(e)}")
-
 @app.get("/models")
-def list_llm_models():
-    try:
-        return JSONResponse(content=fetch_llm_models())
-    except RuntimeError as e:
-        raise HTTPException(status_code=500, detail=str(e))
+def list_safe_chat_models():
+    return JSONResponse(content=[
+        "gpt-4o",
+        "gpt-4.1",
+        "gpt-4",
+        "gpt-4-turbo",
+        "gpt-3.5-turbo",
+        "gpt-4-1106-preview",
+        "gpt-3.5-turbo-1106"
+    ])
