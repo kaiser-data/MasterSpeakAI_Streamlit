@@ -3,14 +3,13 @@ from sqlmodel import Session, select
 from backend.database import SpeechAnalysis, speech_engine
 import pandas as pd
 
-
 st.title("💾 Speech Analysis Database")
 
 st.markdown("""
 Welcome to the **Speech Analysis DB Viewer**.
 
 - 🧭 Browse recent entries below
-- 🔍 Enter an ID to view full speech + GPT analysis
+- 🔍 Scroll through entries using the slider to view full speech + GPT analysis
 """)
 
 # Load records
@@ -33,18 +32,27 @@ df_display = df_display.rename(columns={
     "analysis_result": "Analysis Snippet"
 })
 
-# === Show recent records preview ===
-st.markdown("### 📋 Recent Records")
-st.dataframe(df_display.head(min(5, len(df_display))), use_container_width=True, hide_index=True)
+# === Paginated preview of recent records ===
+st.markdown("### 📋 Browse Records")
 
-# === Manual ID selection ===
+records_per_page = 5
+total_pages = (len(df_display) - 1) // records_per_page + 1
+page = st.number_input("Page", min_value=1, max_value=total_pages, value=1, step=1)
+
+start_idx = (page - 1) * records_per_page
+end_idx = start_idx + records_per_page
+
+st.dataframe(df_display.iloc[start_idx:end_idx], use_container_width=True, hide_index=True)
+
+# === Slider to select individual record ===
 st.markdown("### 🔍 View Full Record by ID")
-id_list = sorted(df["id"].unique(), reverse=True)
-manual_id = st.selectbox("Choose Record ID", options=id_list)
+
+min_id, max_id = int(df["id"].min()), int(df["id"].max())
+selected_id = st.slider("Scroll to Record ID", min_value=min_id, max_value=max_id, value=max_id, step=1)
 
 # Lookup record
-record = df[df["id"] == manual_id]
-original = next((r for r in records if r.id == manual_id), None)
+record = df[df["id"] == selected_id]
+original = next((r for r in records if r.id == selected_id), None)
 
 if original is None:
     st.error("Could not load the selected record.")
